@@ -18,10 +18,13 @@ Discord bot that pulls various info from your server and displays it through sla
 ![image](https://user-images.githubusercontent.com/107073565/216780462-b323101c-51d2-4922-9b07-d535e7a4f921.png)
 
 ```"serverName": "KarmaDev"``` - Set as the name you want to show up in sent slash commands, your servers name
+
 ```"website": "https://krma.site"``` - Set as your website
+
 ```"iconURL": "xxxxxxxxxxxx.png"``` - Set as the logo you want for slash command author
 
 ```"token": "xxxxxx"``` - Discord Bot Token (https://docs.discordbotstudio.org/setting-up-dbs/finding-your-bot-token)
+
 ```"clientID": "xxxxxx"``` - Discord Bot's Client ID
 
 ```"Game": "gmod"``` - Set this as this part of your server's BattleMetrics URL
