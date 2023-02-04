@@ -14,6 +14,7 @@ Discord bot that pulls various info from your server and displays it through sla
 
 ### **Config Walkthrough -**
 1. Configure the config.json file to have your game server/bot parameters
+
 ![image](https://user-images.githubusercontent.com/107073565/216780462-b323101c-51d2-4922-9b07-d535e7a4f921.png)
 
 ```"serverName": "KarmaDev"``` - Set as the name you want to show up in sent slash commands, your servers name
@@ -23,8 +24,9 @@ Discord bot that pulls various info from your server and displays it through sla
 ```"token": "xxxxxx"``` - Discord Bot Token (https://docs.discordbotstudio.org/setting-up-dbs/finding-your-bot-token)
 ```"clientID": "xxxxxx"``` - Discord Bot's Client ID
 
-```"Game": "gmod"``` - Set this as this part of your server's BattleMetrics URL: 
+```"Game": "gmod"``` - Set this as this part of your server's BattleMetrics URL
 ![image](https://user-images.githubusercontent.com/107073565/216780645-26b57906-073c-402e-b2e0-cb7045a4f193.png)
+
 ```"BM_ServerID": "xxxxxxxx"``` - Set this as your servers BattleMetrics ID
 ![image](https://user-images.githubusercontent.com/107073565/216780694-0e730e79-0e20-4e24-8cd2-11e6eaa573cf.png)
 
