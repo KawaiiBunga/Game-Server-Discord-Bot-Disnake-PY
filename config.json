@@ -1,0 +1,13 @@
+{
+	"serverName": "KarmaDev",
+	"website": "https://krma.site/",
+	"iconURL": "https://krma.site/images/karma.png",
+
+    "token": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+	"clientId": "xxxxxxxxxxxxxxxxxxxx",
+
+	"Game": "gmod",
+	"BM_ServerID": "xxxxxxxx",
+	
+	"StatusText": "on KarmaMC - "
+}
