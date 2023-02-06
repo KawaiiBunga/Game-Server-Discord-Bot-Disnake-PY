@@ -1,6 +1,9 @@
 # Game-Server-Discord-Bot (Made in Disnake Py)
 Discord bot that pulls various info from your server and displays it through slash commands using BattleMetrics API. Also sets the status of the bot as playercount/maxplayers
 
+### **License -**
+Covered under Unlicense (https://unlicense.org)
+
 ### **Requirements -** 
 - Python 3.10+
 - A discord bot application
