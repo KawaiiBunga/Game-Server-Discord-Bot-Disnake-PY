@@ -109,47 +109,86 @@ async def status(inter):
             if resp.status == 200:
                 #Get data from API response
                 resp_dict = json.loads(await resp.text())
-                status = resp_dict["data"]["attributes"]["status"] 
-                PlayerCount = resp_dict["data"]["attributes"]["players"] 
-                MaxPlayers = resp_dict["data"]["attributes"]["maxPlayers"]
-                name = resp_dict["data"]["attributes"]["name"]
-                ip = resp_dict["data"]["attributes"]["ip"]
-                port = resp_dict["data"]["attributes"]["port"]
-                map = resp_dict["data"]["attributes"]["details"]["map"]
-                password = resp_dict["data"]["attributes"]["details"]["password"]
-                gamemode = resp_dict["data"]["attributes"]["details"]["gameMode"]
                 game = resp_dict["data"]["relationships"]["game"]["data"]["id"]
-                #If server is online, send Embed
-                if status == "online":
-                    embed = disnake.Embed(
-                        title = f'Server is {status}',
-                        colour = 0x009FF,
-                        timestamp=datetime.datetime.now(),
-                    )
-                    embed.set_author(
-                        name = serverName + ' Bot',
-                        url = website,
+                if game == "minecraft":
+                    status = resp_dict["data"]["attributes"]["status"] 
+                    PlayerCount = resp_dict["data"]["attributes"]["players"] 
+                    MaxPlayers = resp_dict["data"]["attributes"]["maxPlayers"]
+                    name = resp_dict["data"]["attributes"]["name"]
+                    ip = resp_dict["data"]["attributes"]["ip"]
+                    port = resp_dict["data"]["attributes"]["port"]
+                    version = resp_dict["data"]["attributes"]["details"]["minecraft_version"]["name"]
+                    description = resp_dict["data"]["attributes"]["details"]["minecraft_clean_description"] 
+                    game = resp_dict["data"]["relationships"]["game"]["data"]["id"]
+
+                    #If server is online, send Embed
+                    if status == "online":
+                        embed = disnake.Embed(
+                            title = f'Server is {status}',
+                            colour = 0x009FF,
+                            timestamp=datetime.datetime.now(),
+                        )
+                        embed.set_author(
+                            name = serverName + ' Bot',
+                            url = website,
+                            icon_url = iconURL,
+                        )
+                        embed.set_footer(
+                        text = "Sent by " + serverName + " Bot",
                         icon_url = iconURL,
-                    )
-                    embed.set_footer(
-                    text = "Sent by " + serverName + " Bot",
-                    icon_url = iconURL,
-                    )
+                        )
 
-                    embed.add_field(name = "**Server Name -**", value = name, inline=True)
-                    embed.add_field(name = "**Connect -**", value = f'{ip}:{port}', inline = True)
-                    embed.add_field(name = "**Gamemode -**", value = gamemode, inline=True)
-                    embed.add_field(name = "**Map -**", value = map, inline=False)
-                    embed.add_field(name = "**Player Count -**", value = f'{PlayerCount}/{MaxPlayers}', inline=True)
-                    embed.add_field(name = "**Password? -**", value = password, inline=True)
-                    embed.add_field(name = "**Game -**", value = game, inline=True)
+                        embed.add_field(name = "**Server Name -**", value = name, inline=True)
+                        embed.add_field(name = "**Connect -**", value = f'{ip}:{port}', inline = True)
+                        embed.add_field(name = "**Version -**", value = version, inline=True)
+                        embed.add_field(name = "**Player Count -**", value = f'{PlayerCount}/{MaxPlayers}', inline=True)
+                        embed.add_field(name = "**Description -**", value = description, inline=True)
+                        embed.add_field(name = "**Game -**", value = game, inline=True)
 
-                    await inter.send(embed=embed)
+                        await inter.send(embed=embed)
 
-                else:
-                    #If server is offline, send error code from BM
-                    print(f"Battlemetrics Error with status code: {resp.status}")
-                    await inter.send('BM ERROR')
+                if game == "gmod":
+                    status = resp_dict["data"]["attributes"]["status"] 
+                    PlayerCount = resp_dict["data"]["attributes"]["players"] 
+                    MaxPlayers = resp_dict["data"]["attributes"]["maxPlayers"]
+                    name = resp_dict["data"]["attributes"]["name"]
+                    ip = resp_dict["data"]["attributes"]["ip"]
+                    port = resp_dict["data"]["attributes"]["port"]
+                    password = resp_dict["data"]["attributes"]["details"]["password"]    
+                    game = resp_dict["data"]["relationships"]["game"]["data"]["id"]
+                    map = resp_dict["data"]["attributes"]["details"]["map"]
+                    gamemode = resp_dict["data"]["attributes"]["details"]["gameMode"]
+                    #If server is online, send Embed
+                    if status == "online":
+                        embed = disnake.Embed(
+                            title = f'Server is {status}',
+                            colour = 0x009FF,
+                            timestamp=datetime.datetime.now(),
+                        )
+                        embed.set_author(
+                            name = serverName + ' Bot',
+                            url = website,
+                            icon_url = iconURL,
+                        )
+                        embed.set_footer(
+                        text = "Sent by " + serverName + " Bot",
+                        icon_url = iconURL,
+                        )
+
+                        embed.add_field(name = "**Server Name -**", value = name, inline=True)
+                        embed.add_field(name = "**Connect -**", value = f'{ip}:{port}', inline = True)
+                        embed.add_field(name = "**Gamemode -**", value = gamemode, inline=True)
+                        embed.add_field(name = "**Map -**", value = map, inline=False)
+                        embed.add_field(name = "**Player Count -**", value = f'{PlayerCount}/{MaxPlayers}', inline=True)
+                        embed.add_field(name = "**Password? -**", value = password, inline=True)
+                        embed.add_field(name = "**Game -**", value = game, inline=True)
+
+                        await inter.send(embed=embed)
+
+                    else:
+                        #If server is offline, send error code from BM
+                        print(f"Battlemetrics Error with status code: {resp.status}")
+                        await inter.send('BM ERROR')
          
 #Locate command
 @bot.slash_command(
