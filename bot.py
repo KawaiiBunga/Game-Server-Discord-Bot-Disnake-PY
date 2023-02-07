@@ -19,7 +19,7 @@ with open('config.json') as f:
 url = "https://api.battlemetrics.com/servers/" + str(BM_ServerID)
 uptime_url = "https://api.battlemetrics.com/servers/" + str(BM_ServerID) + "/relationships/outages"
 
-# Global cmd registration, sent .sync_commands_debug to false once in production
+# Global cmd registration, set .sync_commands_debug to false once in production
 command_sync_flags = commands.CommandSyncFlags.default()
 command_sync_flags.sync_commands_debug = False
 
@@ -74,6 +74,10 @@ async def status(inter):
                 name = resp_dict["data"]["attributes"]["name"]
                 ip = resp_dict["data"]["attributes"]["ip"]
                 port = resp_dict["data"]["attributes"]["port"]
+                map = resp_dict["data"]["attributes"]["details"]["map"]
+                password = resp_dict["data"]["attributes"]["details"]["password"]
+                gamemode = resp_dict["data"]["attributes"]["details"]["gameMode"]
+                game = resp_dict["data"]["relationships"]["game"]["data"]["id"]
                 #If server is online, send Embed
                 if status == "online":
                     embed = disnake.Embed(
@@ -91,9 +95,13 @@ async def status(inter):
                     icon_url = iconURL,
                     )
 
-                    embed.add_field(name = "**Connect -**", value = f'{ip}:{port}', inline = False)
-                    embed.add_field(name = "**Server -**", value = name, inline=False)
-                    embed.add_field(name = "**Player Count -**", value = f'{PlayerCount}/{MaxPlayers}', inline=False)
+                    embed.add_field(name = "**Server Name -**", value = name, inline=True)
+                    embed.add_field(name = "**Connect -**", value = f'{ip}:{port}', inline = True)
+                    embed.add_field(name = "**Gamemode -**", value = gamemode, inline=True)
+                    embed.add_field(name = "**Map -**", value = map, inline=False)
+                    embed.add_field(name = "**Player Count -**", value = f'{PlayerCount}/{MaxPlayers}', inline=True)
+                    embed.add_field(name = "**Password? -**", value = password, inline=True)
+                    embed.add_field(name = "**Game -**", value = game, inline=True)
 
                     await inter.send(embed=embed)
 
@@ -189,15 +197,19 @@ async def status(inter):
 async def status(inter):
     async with aiohttp.ClientSession() as session:
         async with session.get(uptime_url) as resp:
-            if resp.status == 200:
+            async with session.get(url) as rep:
+                if resp.status == 200:
                 #Get data from API response
-                resp_dict = json.loads(await resp.text())
-                last_crash_start = resp_dict["data"][int('0')]["attributes"]["start"]
+                    resp_dict = json.loads(await resp.text())
+                    rep_dict = json.loads(await rep.text())
+                    onlinesince = resp_dict["meta"]["onlineSince"]
+                    lastplayerjoin = resp_dict["meta"]["lastPlayerJoin"]
+                    status = rep_dict["data"]["attributes"]["status"] 
  
                 #If server is online, send Embed
                 if status == "online":
                     embed = disnake.Embed(
-                        title = f"{serverName}'s BattleMetrics Rank:",
+                        title = f"{serverName}'s Uptiime:",
                         colour = 0x009FF,
                         timestamp=datetime.datetime.now(),
                     )
@@ -211,13 +223,55 @@ async def status(inter):
                     icon_url = iconURL,
                     )
 
-                    embed.add_field(name = "**Online Since -**", value = f'{serverName} last went offline {last_crash_start}', inline = False)
-                           
+                    embed.add_field(name = "**Online Since -**", value = f'{serverName} has been online since {onlinesince}', inline = False)
+                    embed.add_field(name = "**Last Player Join -**", value = f'The last player joined {serverName} at {lastplayerjoin}', inline = False)       
                     await inter.send(embed=embed)
 
                 else:
                     #Send error if occurs
                     print(f"Battlemetrics Error with status code: {resp.status}")
                     await inter.send('BM ERROR')
+
+#Last Outage command
+@bot.slash_command(
+    name = "lastcrash",
+    description = f"Shows {serverName}'s last outage")
+async def status(inter):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(uptime_url) as resp:
+            async with session.get(url) as rep:
+                if resp.status == 200:
+                #Get data from API response
+                    resp_dict = json.loads(await resp.text())
+                    rep_dict = json.loads(await rep.text())
+                    lastcrashstart = resp_dict["data"][0]["attributes"]["start"]
+                    lastcrashend = resp_dict["data"][0]["attributes"]["stop"]
+                    status = rep_dict["data"]["attributes"]["status"] 
+ 
+                #If server is online, send Embed
+                if status == "online":
+                    embed = disnake.Embed(
+                        title = f"{serverName}'s Last Crash:",
+                        colour = 0x009FF,
+                        timestamp=datetime.datetime.now(),
+                    )
+                    embed.set_author(
+                        name = serverName + ' Bot',
+                        url = website,
+                        icon_url = iconURL,
+                    )
+                    embed.set_footer(
+                    text = "Sent by " + serverName + " Bot",
+                    icon_url = iconURL,
+                    )
+
+                    embed.add_field(name = "**Last Crash Start -**", value = f'{serverName} last crashed/restarted: {lastcrashstart}', inline = False)
+                    embed.add_field(name = "**Last Crash End -**", value = f'{serverName} came back online: {lastcrashend}', inline = False)       
+                    await inter.send(embed=embed)
+
+                else:
+                    #Send error if occurs
+                    print(f"Battlemetrics Error with status code: {resp.status}")
+                    await inter.send('BM ERROR')                    
 
 bot.run(token)
