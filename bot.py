@@ -317,7 +317,7 @@ async def status(inter):
 #playtime command
 @bot.slash_command(
     name = "playtime",
-    description = f"Shows {serverName}'s last outage")
+    description = f"Shows a players playtime on {serverName}")
 async def status(inter, bm_player_id: int):
     async with aiohttp.ClientSession() as session:
         playtime_url = "https://api.battlemetrics.com/players/" + str(bm_player_id) + "/servers/" + str(BM_ServerID)
