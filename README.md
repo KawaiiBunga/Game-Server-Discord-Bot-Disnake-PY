@@ -7,7 +7,7 @@ This bot has been optimized for SRCDS servers. Some aspects of it work with MC s
 Covered under Unlicense (https://unlicense.org)
 
 ### **Requirements -** 
-- Python 3.10+
+- Python 3.11+
 - A discord bot application
 - A game server that is on BattleMetrics (https://www.battlemetrics.com/)
 
