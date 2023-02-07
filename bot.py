@@ -3,6 +3,7 @@ from disnake.ext import tasks, commands
 import aiohttp
 import datetime
 import json
+import requests
 
 # Import data from config file
 with open('config.json') as f:
@@ -15,9 +16,10 @@ with open('config.json') as f:
     website = data["website"]
     BM_ServerID = data["BM_ServerID"]
 
-#Battlemetrics API Call
+#Battlemetrics API URL's
 url = "https://api.battlemetrics.com/servers/" + str(BM_ServerID)
 uptime_url = "https://api.battlemetrics.com/servers/" + str(BM_ServerID) + "/relationships/outages"
+
 
 # Global cmd registration, set .sync_commands_debug to false once in production
 command_sync_flags = commands.CommandSyncFlags.default()
@@ -27,6 +29,45 @@ bot = commands.Bot(
     command_prefix = disnake.ext.commands.when_mentioned,
     command_sync_flags = command_sync_flags,
 )
+
+#Convert/format time for API output
+def time_conversion(seconds):
+    minutes, secs = divmod(seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+    days, hours = divmod(hours, 24)
+    weeks, days = divmod(days, 7)
+    months, weeks = divmod(weeks, 4)
+    years, months = divmod(months, 12)
+
+    time_units = [f"{years} year(s)" if years else None,
+                  f"{months} month(s)" if months else None,
+                  f"{weeks} week(s)" if weeks else None,
+                  f"{days} day(s)" if days else None,
+                  f"{hours} hour(s)" if hours else None,
+                  f"{minutes} minute(s)" if minutes else None,
+                  f"{secs} second(s)" if secs else None]
+    
+    return ', '.join([x for x in time_units if x])
+
+#Convert/format date/time for API output
+def dt_conversion(date_time_str):
+    return datetime.datetime.fromisoformat(date_time_str).strftime("%B %d, %Y %I:%M:%S %p")
+
+#Get location from coordinates for API Output
+def get_location(lat, lon):
+    mapi_url = f"https://nominatim.openstreetmap.org/reverse?format=json&lat={lat}&lon={lon}"
+    response = requests.get(mapi_url)
+    if response.status_code == 200:
+        location_data = response.json()
+        city=location_data["address"]["city"] 
+        state=location_data["address"]["state"] 
+        country=location_data["address"]["country"]
+        location = f"{city}, {state}, {country}"
+        return location
+        
+    else:
+        return None
+
 
 #Updating status from BM API
 @tasks.loop(seconds=20)
@@ -120,8 +161,7 @@ async def status(inter):
             if resp.status == 200:
                 #Get data from API response
                 resp_dict = json.loads(await resp.text())
-                status = resp_dict["data"]["attributes"]["status"] 
-                country = resp_dict["data"]["attributes"]["country"] 
+                status = resp_dict["data"]["attributes"]["status"]  
                 coord = resp_dict["data"]["attributes"]["location"] 
                 #If server is online, send Embed
                 if status == "online":
@@ -140,8 +180,9 @@ async def status(inter):
                     icon_url = iconURL,
                     )
 
-                    embed.add_field(name = "**Country -**", value = f'{country}', inline = False)
-                    embed.add_field(name = "**Coordinates -**", value = f'{coord}', inline = False)
+                    lon, lat = coord
+
+                    embed.add_field(name = "**City, State, Country -**", value = f'{get_location(lat, lon)}', inline = False)
                     
                     await inter.send(embed=embed)
 
@@ -162,7 +203,8 @@ async def status(inter):
                 resp_dict = json.loads(await resp.text())
                 status = resp_dict["data"]["attributes"]["status"] 
                 id = resp_dict["data"]["attributes"]["id"]  
-                rank = resp_dict["data"]["attributes"]["rank"]   
+                rank = resp_dict["data"]["attributes"]["rank"] 
+                name = resp_dict["data"]["attributes"]["name"]  
                 #If server is online, send Embed
                 if status == "online":
                     embed = disnake.Embed(
@@ -180,7 +222,7 @@ async def status(inter):
                     icon_url = iconURL,
                     )
 
-                    embed.add_field(name = "**Server Rank -**", value = f'Server {id} is ranked {rank} on BattleMetrics', inline = False)
+                    embed.add_field(name = "**Server Rank -**", value = f'{name} is ranked {rank} on BattleMetrics', inline = False)
                     embed.add_field(name = "**BattleMetrics Link -**", value = f'https://www.battlemetrics.com/servers/{game}/{id}', inline = False)
                     
                     await inter.send(embed=embed)
@@ -223,8 +265,8 @@ async def status(inter):
                     icon_url = iconURL,
                     )
 
-                    embed.add_field(name = "**Online Since -**", value = f'{serverName} has been online since {onlinesince}', inline = False)
-                    embed.add_field(name = "**Last Player Join -**", value = f'The last player joined {serverName} at {lastplayerjoin}', inline = False)       
+                    embed.add_field(name = "**Online Since -**", value = f'{serverName} has been online since {dt_conversion(onlinesince)}', inline = False)
+                    embed.add_field(name = "**Last Player Join -**", value = f'The last player joined {serverName} at {dt_conversion(lastplayerjoin)}', inline = False)       
                     await inter.send(embed=embed)
 
                 else:
@@ -248,8 +290,6 @@ async def status(inter):
                     lastcrashend = resp_dict["data"][0]["attributes"]["stop"]
                     status = rep_dict["data"]["attributes"]["status"] 
  
-                #If server is online, send Embed
-                if status == "online":
                     embed = disnake.Embed(
                         title = f"{serverName}'s Last Crash:",
                         colour = 0x009FF,
@@ -265,13 +305,63 @@ async def status(inter):
                     icon_url = iconURL,
                     )
 
-                    embed.add_field(name = "**Last Crash Start -**", value = f'{serverName} last crashed/restarted: {lastcrashstart}', inline = False)
-                    embed.add_field(name = "**Last Crash End -**", value = f'{serverName} came back online: {lastcrashend}', inline = False)       
+                    embed.add_field(name = "**Last Crash Start -**", value = f'{serverName} last crashed/restarted: {dt_conversion(lastcrashstart)}', inline = False)
+                    embed.add_field(name = "**Last Crash End -**", value = f'{serverName} came back online: {dt_conversion(lastcrashend)}', inline = False)       
                     await inter.send(embed=embed)
 
                 else:
                     #Send error if occurs
                     print(f"Battlemetrics Error with status code: {resp.status}")
                     await inter.send('BM ERROR')                    
+
+#playtime command
+@bot.slash_command(
+    name = "playtime",
+    description = f"Shows {serverName}'s last outage")
+async def status(inter, bm_player_id: int):
+    async with aiohttp.ClientSession() as session:
+        playtime_url = "https://api.battlemetrics.com/players/" + str(bm_player_id) + "/servers/" + str(BM_ServerID)
+        player_url = "https://api.battlemetrics.com/players/" + str(bm_player_id)
+        async with session.get(playtime_url) as resp:
+            async with session.get(player_url) as player:
+                async with session.get(url) as rep:
+                    if resp.status == 200:
+                #Get data from API response
+                        resp_dict = json.loads(await resp.text())
+                        player_dict = json.loads(await player.text())
+                        firstjoin = resp_dict["data"]["attributes"]["firstSeen"]
+                        lastjoin = resp_dict["data"]["attributes"]["lastSeen"]
+                        timeplayed = resp_dict["data"]["attributes"]["timePlayed"]
+                        online = resp_dict["data"]["attributes"]["online"] 
+                        playername = player_dict["data"]["attributes"]["name"]
+ 
+                        embed = disnake.Embed(
+                            title = f"{playername}'s Play Stats on {serverName}:",
+                            colour = 0x009FF,
+                            timestamp=datetime.datetime.now(),
+                        )
+                        embed.set_author(
+                            name = serverName + ' Bot',
+                            url = website,
+                            icon_url = iconURL,
+                        )
+                        embed.set_footer(
+                            text = "Sent by " + serverName + " Bot",
+                            icon_url = iconURL,
+                        )
+
+                        if online == "true":
+                            embed.add_field(name = "**Online Status -**", value = 'Online', inline = False)      
+                        else:
+                            embed.add_field(name = "**Online Status -**", value = 'Offline', inline = False) 
+                        
+                        embed.add_field(name = "**First Joined -**", value = f'{dt_conversion(firstjoin)}', inline = False)
+                        embed.add_field(name = "**Last Joined -**", value = f'{dt_conversion(lastjoin)}', inline = False)  
+                        embed.add_field(name = "**Time Played -**", value = f'{time_conversion(timeplayed)}', inline = False) 
+                        await inter.send(embed=embed)
+                    else:
+                        #Send error if occurs
+                        print(f"Battlemetrics Error with status code: {resp.status}")
+                        await inter.send('BM ERROR')
 
 bot.run(token)
