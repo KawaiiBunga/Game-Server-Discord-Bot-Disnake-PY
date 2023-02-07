@@ -1,6 +1,7 @@
 # Game-Server-Discord-Bot (Made in Disnake Py)
 Discord bot that pulls various info from your server and displays it through slash commands using BattleMetrics API. Also sets the status of the bot as playercount/maxplayers
 
+/uptime, /playtime, and /lastcrash do NOT work for MC servers right now, this is currently being worked on
 
 ### **License -**
 Covered under Unlicense (https://unlicense.org)
