@@ -70,4 +70,30 @@ Covered under Unlicense (https://unlicense.org)
 
 ### **Slash commands -**
 
-Section being added soon
+![image](https://user-images.githubusercontent.com/107073565/217389758-76ab54e9-5b6f-4c98-8a33-6c2d334c2b4f.png)
+
+```/lastcrash``` - Shows the last outage the server had
+![image](https://user-images.githubusercontent.com/107073565/217389818-90eb29d3-447a-40c2-9256-7c2f4e8d18e8.png)
+
+```/locate``` - Shows the servers location
+![image](https://user-images.githubusercontent.com/107073565/217389864-df745407-1ba5-40b0-be48-9a738fef7a90.png)
+
+```/playtime``` - Shows a players play-time on the server using their BattleMetrics playerID
+![image](https://user-images.githubusercontent.com/107073565/217390068-324dfd49-ce63-44c8-a9e7-71f05be90c0e.png)
+
+```/rank``` - Shows the servers rank on BattleMetrics
+![image](https://user-images.githubusercontent.com/107073565/217390134-502277d3-79bd-44eb-9abd-4d1c27e7a734.png)
+
+```/status``` - Shows the server status and various info about the server (changes info shown based on game server type)
+![image](https://user-images.githubusercontent.com/107073565/217390198-43813733-f662-49da-a01f-e9022d7c3f57.png)
+
+```/uptime``` - Shows the servers uptime and when the last player joined
+![image](https://user-images.githubusercontent.com/107073565/217390290-b69f21a2-834a-488c-b61e-19594344e060.png)
+
+
+
+
+
+
+
+
