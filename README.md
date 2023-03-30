@@ -14,7 +14,7 @@ Covered under Unlicense (https://unlicense.org)
 ### **Dependencies -**
 - ```pip install Disnake```
 - ```pip install AIOHTTP```
-- ```pip install Json```
+- ```pip install requests```
 - ```pip install datetime```
 
 ### **Config Walkthrough -**
