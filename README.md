@@ -16,7 +16,7 @@ Covered under Unlicense (https://unlicense.org)
 - A game server that is on BattleMetrics (https://www.battlemetrics.com/)
 
 ### **Dependencies -**
-- Run ```pip install requirements.txt``` from the CMD Prompt/Terminal
+- Run ```pip install requirements.txt``` from the CMD Prompt/Terminal in the project root
 
 ### **Config Walkthrough -**
 1. Configure the config.json file to have your game server/bot parameters
