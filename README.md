@@ -16,10 +16,7 @@ Covered under Unlicense (https://unlicense.org)
 - A game server that is on BattleMetrics (https://www.battlemetrics.com/)
 
 ### **Dependencies -**
-- ```pip install Disnake```
-- ```pip install AIOHTTP```
-- ```pip install requests```
-- ```pip install datetime```
+- Run ```pip install requirements.txt``` from the CMD Prompt/Terminal
 
 ### **Config Walkthrough -**
 1. Configure the config.json file to have your game server/bot parameters
