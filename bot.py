@@ -290,7 +290,7 @@ async def status(inter):
                 #If server is online, send Embed
                 if status == "online":
                     embed = disnake.Embed(
-                        title = f"{serverName}'s Uptiime:",
+                        title = f"{serverName}'s Uptime:",
                         colour = 0x009FF,
                         timestamp=datetime.datetime.now(),
                     )
